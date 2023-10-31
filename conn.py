@@ -1,13 +1,15 @@
 import pyodbc
 
+
 def db():
     try:
-        connection = pyodbc.connect(Driver='{SQL Server}',
-                                    Server='localhost',
-                                    Database='12001',
-                                    Trusted_Connection='yes')
-        print("Conexão bem-sucedida ao banco de dados.")
-        return connection
+        connectionAuth = pyodbc.connect(Driver='{SQL Server}',
+                                        Server='10.1.1.243\sql2014',
+                                        Database='12001',
+                                        user='sa',
+                                        password='omni@50ftp4r')
+        print('Conexão bem-sucedida com autenticação de usuário/senha')
+        return connectionAuth
     except pyodbc.Error as e:
-        print("Erro ao conectar ao banco de dados:", e)
+        print('Erro de autenticação de usuário/senha:', e)
         return None

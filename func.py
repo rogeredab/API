@@ -5,8 +5,8 @@ def cursor(sql):
     conn = db()
     cursor = conn.cursor()
     cursor.execute(sql)
-    retorno = cursor.fetchone()
+    dados = cursor.fetchall()
     conn.close()
-    print(retorno)
+    return dados
 
 

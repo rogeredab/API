@@ -11,4 +11,11 @@ def execute_sql(sql):
     return data_list
 
 
-
+def delete_sql(sql):
+    conn = db()
+    cur = conn.cursor()
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+    return 'SQL de deletar executado com sucesso '

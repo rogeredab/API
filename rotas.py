@@ -101,5 +101,17 @@ def delReqItem(req_id, req_emp, reqi_ni):
         abort(500)
 
 
+@api.route('/API/reqretdel/<req_id>/<req_emp>', methods=['DELETE'])
+def delReqRet(req_id, req_emp):
+    try:
+        sql = "delete from ALMOXARIFADO_REQUISICAO_RETIRADA where ARR_ARI_ID in (select ARR_ARI_ID from ALMOXARIFADO_REQUISICAO_ITENS where ARR_ARI_ID = ARI_ID and ARI_ARE_ID = {} and ARI_EMP_CODIGO = {})".format(
+            req_id, req_emp)
+        delete_sql(sql)
+        return jsonify({"message": "Itens retirados excluidos com sucesso!"}), 200
+    except Exception as e:
+        print("Erro", e)
+        abort(500)
+
+
 if __name__ == '__main__':
     api.run(debug=True)

@@ -47,11 +47,12 @@ def getReqEsp(req_id, req_emp):
         abort(500)
 
 
-@api.route('/API/reqretirada/<reqi_id>/<req_emp>', methods=['GET'])
-def getReqRet(reqi_id, req_emp):
+@api.route('/API/reqretirada/<req_id>/<req_emp>', methods=['GET'])
+def getReqRet(req_id, req_emp):
     try:
-        sql = "SELECT * FROM ALMOXARIFADO_REQUISICAO_RETIRADA WHERE ARR_ARE_ID = {} AND ARR_EMP_CODIGO = {}".format(
-            reqi_id, req_emp)
+        sql = "select * from ALMOXARIFADO_REQUISICAO_RETIRADA join ALMOXARIFADO_REQUISICAO_ITENS on ari_id = " \
+              "ARR_ARI_ID where ARI_ARE_ID = {} and ARI_EMP_CODIGO = {}".format(
+            req_id, req_emp)
         dados = execute_sql(sql)
         if not dados:
             print("Não foi encontrado dados nesses params")
@@ -77,7 +78,8 @@ def delReq(req_id, req_emp):
 @api.route('/API/reqitensdel/<req_id>/<req_emp>', methods=['DELETE'])
 def delReqItens(req_id, req_emp):
     try:
-        sql = "DELETE FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} and ari_emp_codigo = {}".format(req_id, req_emp)
+        sql = "DELETE FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} and ari_emp_codigo = {}".format(req_id,
+                                                                                                               req_emp)
         delete_sql(sql)
         return jsonify({"message": "Solicitação de retirada excluída com sucesso!"}), 200
 
@@ -89,7 +91,8 @@ def delReqItens(req_id, req_emp):
 @api.route('/API/reqitemdel/<req_id>/<req_emp>/<reqi_ni>', methods=['DELETE'])
 def delReqItem(req_id, req_emp, reqi_ni):
     try:
-        sql = "DELETE FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} and ari_emp_codigo = {} and ari_ni = {}".format(req_id,req_emp,reqi_ni)
+        sql = "DELETE FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} and ari_emp_codigo = {} and ari_ni = {}".format(
+            req_id, req_emp, reqi_ni)
         delete_sql(sql)
         return jsonify({"message": "Item solicitado retirado com sucesso!"}), 200
 

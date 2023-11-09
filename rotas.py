@@ -62,5 +62,17 @@ def getReqRet(reqi_id, req_emp):
         abort(500)
 
 
+@api.route('/API/reqdel/<reqi_id>/<req_emp>', methods=['DELETE'])
+def delReq(req_id, req_emp):
+    try:
+        sql = "DELETE FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} and are_emp_codigo = {}".format(req_id, req_emp)
+        execute_sql(sql)
+        return jsonify({"message": "Solicitação de retirada excluída com sucesso!"}), 200
+
+    except Exception as e:
+        print("Erro", e)
+        abort(500)
+
+
 if __name__ == '__main__':
     api.run(debug=True)

@@ -1,4 +1,5 @@
 from conn import db
+from datetime import datetime
 
 
 def execute_sql(sql):
@@ -19,3 +20,8 @@ def delete_sql(sql):
     cur.close()
     conn.close()
     return 'SQL de deletar executado com sucesso '
+
+
+def datetime_atual():
+    data_atual = datetime.now()
+    return data_atual

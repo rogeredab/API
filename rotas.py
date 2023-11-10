@@ -112,6 +112,12 @@ def delReqRet(req_id, req_emp):
         print("Erro", e)
         abort(500)
 
+@api.route('/API/reqpost/<req_emp>', methods=['POST'])
+def ReqPost(req_emp):
+    try:
+        sql_last = "select top 1 ARE_ID from ALMOXARIFADO_REQUISICAO order by ARE_ID desc"
+        last = execute_sql(sql_last)
+        sql = "INSERT INTO "
 
 if __name__ == '__main__':
     api.run(debug=True)

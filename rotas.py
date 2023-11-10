@@ -117,7 +117,46 @@ def ReqPost(req_emp):
     try:
         sql_last = "select top 1 ARE_ID from ALMOXARIFADO_REQUISICAO order by ARE_ID desc"
         last = execute_sql(sql_last)
-        sql = "INSERT INTO "
+        sql = """INSERT INTO ALMOXARIFADO_REQUISICAO
+           (ARE_ID
+		   ,ARE_EMP_CODIGO
+           ,ARE_DATA_SOLICITACAO
+           ,ARE_DATA_RETIRADA
+           ,ARE_RESPONSAVEL
+           ,ARE_SOLICITANTE
+           ,ARE_LAP_ID
+           ,ARE_LAP_DESCRICAO
+           ,ARE_DESCRICAO_USO
+           ,ARE_STATUS
+           ,ARE_USU_REQUISICAO
+           ,ARE_USU_LIBERACAO
+           ,ARE_TERMINAL_REQUISICAO
+           ,ARE_TERMINAL_LIBERACAO
+           ,ARE_DATAINC
+           ,ARE_OBSERVACAO
+           ,ARE_TIPO
+           ,ARE_ORDEM_PRODUCAO
+           ,ARE_CENTRO_CUSTO)
+     VALUES
+           (515
+		   ,3
+           ,GETDATE()
+           ,NULL
+           ,1544
+           ,5160
+           ,1
+           ,'TESTE'
+           ,'TESTE'
+           ,1
+           ,2
+           ,2
+           ,'api'
+           ,NULL
+           ,GETDATE()
+           ,'.'
+           ,0
+           ,'1'
+           ,1)"""
 
 if __name__ == '__main__':
     api.run(debug=True)

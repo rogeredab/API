@@ -13,3 +13,4 @@ def db():
     except pyodbc.Error as e:
         print('Erro de autenticação de usuário/senha:', e)
         return None
+

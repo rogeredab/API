@@ -34,5 +34,4 @@ def insert_sql(sql, values):
 
 def datetime_atual():
     data_atual = datetime.now()
-    data_formatada = data_atual.strftime("%Y-%m-%d %H:%M:%S")
-    return data_formatada
+    return data_atual

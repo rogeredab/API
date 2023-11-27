@@ -1,5 +1,6 @@
-from flask import Flask, abort, jsonify
-from func import execute_sql, delete_sql
+from flask import Flask, abort, jsonify, request
+from func import execute_sql, delete_sql, insert_sql
+from func import datetime_atual
 
 api = Flask(__name__)
 
@@ -112,51 +113,60 @@ def delReqRet(req_id, req_emp):
         print("Erro", e)
         abort(500)
 
+
 @api.route('/API/reqpost/<req_emp>', methods=['POST'])
 def ReqPost(req_emp):
     try:
         sql_last = "select top 1 ARE_ID from ALMOXARIFADO_REQUISICAO order by ARE_ID desc"
         last = execute_sql(sql_last)
+        are_idplus = int(last[0]['ARE_ID']) + 1
+        data = request.get_json()
+
+        are_emp_codigo = data['are_emp_codigo']
+        are_responsavel = data['are_responsavel']
+        are_solicitante = data['are_solicitante']
+        are_lap_id = data['are_lap_id']
+        are_lap_descricao = data['are_lap_descricao']
+        are_descricao_uso = data['are_descricao_uso']
+        are_status = data['are_status']
+        are_usu_requisicao = data['are_usu_requisicao']
+        are_usu_liberacao = data['are_usu_liberacao']
+        are_terminal_requisicao = data['are_terminal_requisicao']
+        are_terminal_liberacao = data['are_terminal_liberacao']
+        are_datainc = datetime_atual()
+        are_observacao = data['are_observacao']
+        are_tipo = data['are_tipo']
+        are_ordem_producao = data['are_ordem_producao']
+        are_centro_custo = data['are_centro_custo']
+
         sql = """INSERT INTO ALMOXARIFADO_REQUISICAO
-           (ARE_ID
-		   ,ARE_EMP_CODIGO
-           ,ARE_DATA_SOLICITACAO
-           ,ARE_DATA_RETIRADA
-           ,ARE_RESPONSAVEL
-           ,ARE_SOLICITANTE
-           ,ARE_LAP_ID
-           ,ARE_LAP_DESCRICAO
-           ,ARE_DESCRICAO_USO
-           ,ARE_STATUS
-           ,ARE_USU_REQUISICAO
-           ,ARE_USU_LIBERACAO
-           ,ARE_TERMINAL_REQUISICAO
-           ,ARE_TERMINAL_LIBERACAO
-           ,ARE_DATAINC
-           ,ARE_OBSERVACAO
-           ,ARE_TIPO
-           ,ARE_ORDEM_PRODUCAO
-           ,ARE_CENTRO_CUSTO)
-     VALUES
-           (515
-		   ,3
-           ,GETDATE()
-           ,NULL
-           ,1544
-           ,5160
-           ,1
-           ,'TESTE'
-           ,'TESTE'
-           ,1
-           ,2
-           ,2
-           ,'api'
-           ,NULL
-           ,GETDATE()
-           ,'.'
-           ,0
-           ,'1'
-           ,1)"""
+                    (ARE_ID, ARE_EMP_CODIGO, ARE_DATA_SOLICITACAO, ARE_RESPONSAVEL, ARE_SOLICITANTE,
+                     ARE_LAP_ID, ARE_LAP_DESCRICAO, ARE_DESCRICAO_USO, ARE_STATUS, ARE_USU_REQUISICAO,
+                     ARE_USU_LIBERACAO, ARE_TERMINAL_REQUISICAO, ARE_TERMINAL_LIBERACAO, ARE_DATAINC,
+                     ARE_OBSERVACAO, ARE_TIPO, ARE_ORDEM_PRODUCAO, ARE_CENTRO_CUSTO)
+                    VALUES
+                    (?, ?, GETDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+        values = (
+            are_idplus, are_emp_codigo, are_responsavel, are_solicitante, are_lap_id,
+            are_lap_descricao, are_descricao_uso, are_status, are_usu_requisicao,
+            are_usu_liberacao, are_terminal_requisicao, are_terminal_liberacao, are_datainc,
+            are_observacao, are_tipo, are_ordem_producao, are_centro_custo
+        )
+
+        insert_sql(sql, values)
+
+        checksql = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {}".format(are_idplus)
+        dados = execute_sql(checksql)
+
+        if not dados:
+            return jsonify({"message": "Requisição falhou"}), 500  # Retornar código de status 500
+
+        return jsonify({"message": "Requisição inserida com sucesso"}), 200
+
+    except Exception as e:
+        print("Erro", e)
+        return jsonify({"message": "Inserção falhou"}), 500
+
 
 if __name__ == '__main__':
     api.run(debug=True)

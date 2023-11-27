@@ -22,6 +22,17 @@ def delete_sql(sql):
     return 'SQL de deletar executado com sucesso '
 
 
+def insert_sql(sql, values):
+    conn = db()
+    cur = conn.cursor()
+    cur.execute(sql, values)
+    conn.commit()
+    cur.close()
+    conn.close()
+    return 'SQL de inserir executado com sucesso '
+
+
 def datetime_atual():
     data_atual = datetime.now()
-    return data_atual
+    data_formatada = data_atual.strftime("%Y-%m-%d %H:%M:%S")
+    return data_formatada

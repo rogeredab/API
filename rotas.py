@@ -120,6 +120,7 @@ def ReqPost(req_emp):
         sql_last = "select top 1 ARE_ID from ALMOXARIFADO_REQUISICAO order by ARE_ID desc"
         last = execute_sql(sql_last)
         are_idplus = int(last[0]['ARE_ID']) + 1
+
         data = request.get_json()
 
         are_emp_codigo = data['are_emp_codigo']
@@ -166,6 +167,46 @@ def ReqPost(req_emp):
     except Exception as e:
         print("Erro", e)
         return jsonify({"message": "Inserção falhou"}), 500
+
+
+@api.route('API/reqitenpost/<req_id>/<req_emp>', methods=['POST'])
+def ReqItemPost(req_id, req_emp):
+    try:
+        checksql = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(req_id,
+                                                                                                                 req_emp)
+        dados = execute_sql(checksql)
+        if not dados:
+            return jsonify({"message": "Requisição inexistente ou código da empresa informado incorretamente"}), 200
+
+        checksql2 = "SELECT ARE_STATUS FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(
+            req_id, req_emp)
+        status = int(checksql2[0]['ARE_STATUS'])
+        if not requisicao_aberta_e_nao_retirada(are_id):
+            lidar_com_requisicao_nao_aberta_ou_retirada()
+            raise AlgumTipoDeErro
+
+        if item_nao_inserido(are_id, item):
+            if item_existe_e_aumentar_quantidade(are_id, item):
+                use_patch(are_id, item)
+            elif item_existe_e_substituir_quantidade(are_id, item):
+                use_put(are_id, item)
+            else:
+                ultima_numeracao = encontrar_ultima_numeracao(are_id)
+                novo_item = ultima_numeracao + 1
+                inserir_item(are_id, novo_item)
+        else:
+            lidar_com_item_ja_inserido()
+
+    except ExcecaoEspecifica as erro:
+        lidar_com_excecao_especifica(erro)
+    except AlgumTipoDeErro:
+        # Lidar com erros específicos
+        lidar_com_algum_tipo_de_erro()
+    except Exception as e:
+        # Lidar com outras exceções
+        lidar_com_outras_excecoes(e)
+    finally:
+        acoes_finais()
 
 
 if __name__ == '__main__':

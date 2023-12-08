@@ -172,58 +172,6 @@ def ReqItemPost(req_id, req_emp):
     try:
         data = request.get_json()
 
-        ari_id = data['ari_id']
-        ari_emp_codigo = data['ari_emp_codigo']
-        ari_ni = data['ari_ni']
-        ari_are_id = data['ari_are_id']
-        ari_pro_codigo = data['ari_pro_codigo']
-        ari_pro_descricao = data['ari_pro_descricao']
-        ari_quantidade_requisicao = data['ari_quantidade_requisicao']
-        ari_quantidade_retirada = data['ari_quantidade_retirada']
-        ari_custo_unitario = data['ari_custo_unitario']
-        ari_custo_total = data['ari_custo_total']
-        ari_observacao = data['ari_observacao']
-        ari_status = data['ari_status']
-        ari_datainc = data['ari_datainc']
-        ari_usu_codigo = data['ari_usu_codigo']
-        ari_terminal = data['ari_terminal']
-        sql = """INSERT INTO ALMOXARIFADO_REQUISICAO_ITENS
-           (ARI_ID
-           ,ARI_EMP_CODIGO
-           ,ARI_NI
-           ,ARI_ARE_ID
-           ,ARI_PRO_CODIGO
-           ,ARI_PRO_DESCRICAO
-           ,ARI_QUANTIDADE_REQUISICAO
-           ,ARI_QUANTIDADE_RETIRADA
-           ,ARI_CUSTO_UNITARIO
-           ,ARI_CUSTO_TOTAL
-           ,ARI_OBSERVACAO
-           ,ARI_STATUS
-           ,ARI_DATAINC
-           ,ARI_USU_CODIGO
-           ,ARI_TERMINAL)
-     VALUES
-           (?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?
-           ,?)"""
-        values = (
-        ari_id, ari_emp_codigo, ari_ni, ari_are_id, ari_pro_codigo, ari_pro_descricao, ari_quantidade_requisicao,
-        ari_quantidade_retirada, ari_custo_unitario, ari_custo_total, ari_observacao, ari_status, ari_datainc,
-        ari_usu_codigo, ari_terminal
-        )
         checksql = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(req_id,
                                                                                                                  req_emp)
         dados = execute_sql(checksql)
@@ -242,6 +190,71 @@ def ReqItemPost(req_id, req_emp):
         elif status == 1:
             return jsonify({"message": "Requisição já foi retirada"}), abort(500)
 
+        checksql4 = "SELECT TOP 1 ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} ORDER BY ARI_ID DESC".format(req_emp)
+        ari_idplus = execute_sql(checksql4)
+        last = int(ari_idplus[0]['ARI_ID']) + 1
+
+        checksql5 = "SELECT TOP 1 ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} AND ARI_ARE_ID = {} ORDER BY ARI_ID DESC".format(req_emp, req_id)
+        ari_niplus = execute_sql(checksql5)
+        nilast = ''
+        if ari_niplus[0]['ARI_NI'] == '':
+            nilast = 1
+        else:
+            nilast = ari_niplus[0]['ARI_NI'] + 1
+
+        ari_id = last
+        ari_emp_codigo = data['ari_emp_codigo']
+        ari_ni = nilast
+        ari_are_id = data['ari_are_id']
+        ari_pro_codigo = data['ari_pro_codigo']
+        ari_pro_descricao = data['ari_pro_descricao']
+        ari_quantidade_requisicao = data['ari_quantidade_requisicao']
+        ari_quantidade_retirada = data['ari_quantidade_retirada']
+        ari_custo_unitario = data['ari_custo_unitario']
+        ari_custo_total = data['ari_custo_total']
+        ari_observacao = data['ari_observacao']
+        ari_status = data['ari_status']
+        ari_datainc = datetime_atual()
+        ari_usu_codigo = data['ari_usu_codigo']
+        ari_terminal = data['ari_terminal']
+        sql = """INSERT INTO ALMOXARIFADO_REQUISICAO_ITENS
+                   (ARI_ID
+                   ,ARI_EMP_CODIGO
+                   ,ARI_NI
+                   ,ARI_ARE_ID
+                   ,ARI_PRO_CODIGO
+                   ,ARI_PRO_DESCRICAO
+                   ,ARI_QUANTIDADE_REQUISICAO
+                   ,ARI_QUANTIDADE_RETIRADA
+                   ,ARI_CUSTO_UNITARIO
+                   ,ARI_CUSTO_TOTAL
+                   ,ARI_OBSERVACAO
+                   ,ARI_STATUS
+                   ,ARI_DATAINC
+                   ,ARI_USU_CODIGO
+                   ,ARI_TERMINAL)
+             VALUES
+                   (?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?
+                   ,?)"""
+        values = (
+            ari_id, ari_emp_codigo, ari_ni, ari_are_id, ari_pro_codigo, ari_pro_descricao, ari_quantidade_requisicao,
+            ari_quantidade_retirada, ari_custo_unitario, ari_custo_total, ari_observacao, ari_status, ari_datainc,
+            ari_usu_codigo, ari_terminal
+        )
+
         checksql3 = "SELECT ARI_PRO_CODIGO FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {}".format(
             req_id, req_emp)
 
@@ -256,7 +269,6 @@ def ReqItemPost(req_id, req_emp):
 
         insert_sql(sql, values)
 
-        # FAZER INCREMENT DO ARI_ID E DO ARI_NI ANTES DE RODAR O INSERT
     except Exception as e:
         print(e), abort(500)
 

@@ -91,7 +91,8 @@ def delReqItens(req_id, req_emp):
 @api.route('/API/reqitemdel/<req_id>/<req_emp>/<reqi_ni>', methods=['DELETE'])
 def delReqItem(req_id, req_emp, reqi_ni):
     try:
-        sql = "DELETE FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} and ari_emp_codigo = {} and ari_ni = {}".format(req_id, req_emp, reqi_ni)
+        sql = "DELETE FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} and ari_emp_codigo = {} and ari_ni = {}".format(
+            req_id, req_emp, reqi_ni)
         delete_sql(sql)
         return jsonify({"message": "Item solicitado retirado com sucesso!"}), 200
 
@@ -112,7 +113,7 @@ def delReqRet(req_id, req_emp):
         abort(500)
 
 
-@api.route('/API/reqpost/', methods=['POST'])
+@api.route('/API/reqpost', methods=['POST'])
 def ReqPost():
     try:
         sql_last = "select top 1 ARE_ID from ALMOXARIFADO_REQUISICAO order by ARE_ID desc"
@@ -167,17 +168,15 @@ def ReqPost():
         return jsonify({"message": "Inserção falhou"}), 500
 
 
-@api.route('API/reqitenpost/<req_id>/<req_emp>', methods=['POST'])
+@api.route('/API/reqitenpost/<req_id>/<req_emp>', methods=['POST'])
 def ReqItemPost(req_id, req_emp):
     try:
-        data = request.get_json()
-
         checksql = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(req_id,
                                                                                                                  req_emp)
         dados = execute_sql(checksql)
         if not dados:
-            return jsonify({"message": "Requisição inexistente ou código da empresa informado incorretamente"}), abort(
-                500)
+            return jsonify(
+                {"message": "Requisição inexistente ou código da empresa informado incorretamente", "status": 404}), 200
 
         checksql2 = "SELECT ARE_STATUS FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(
             req_id, req_emp)
@@ -186,26 +185,32 @@ def ReqItemPost(req_id, req_emp):
         status = int(sqlstatus[0]['ARE_STATUS'])
 
         if status == 3:
-            return jsonify({"message": "Requisição se encontra cancelada"}), abort(500)
-        elif status == 1:
-            return jsonify({"message": "Requisição já foi retirada"}), abort(500)
+            return jsonify({"message": "Requisição se encontra cancelada", "status": 500}), 200
+        elif status == 2:
+            return jsonify({"message": "Requisição já foi retirada", "status": 500}), 200
 
-        checksql4 = "SELECT TOP 1 ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} ORDER BY ARI_ID DESC".format(req_emp)
+        checksql4 = "SELECT TOP 1 ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} ORDER BY ARI_ID DESC".format(
+            req_emp)
         ari_idplus = execute_sql(checksql4)
         last = int(ari_idplus[0]['ARI_ID']) + 1
 
-        checksql5 = "SELECT TOP 1 ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} AND ARI_ARE_ID = {} ORDER BY ARI_ID DESC".format(req_emp, req_id)
+        checksql5 = "SELECT TOP 1 ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} AND ARI_ARE_ID = {} ORDER BY ARI_ID DESC".format(
+            req_emp, req_id)
         ari_niplus = execute_sql(checksql5)
         nilast = ''
-        if ari_niplus[0]['ARI_NI'] == '':
+        if ari_niplus and ari_niplus[0]['ARI_NI'] == '':
             nilast = 1
-        else:
+        elif ari_niplus:
             nilast = ari_niplus[0]['ARI_NI'] + 1
+        else:
+            nilast = 1
+
+        data = request.get_json()
 
         ari_id = last
-        ari_emp_codigo = data['ari_emp_codigo']
+        ari_emp_codigo = req_emp
         ari_ni = nilast
-        ari_are_id = data['ari_are_id']
+        ari_are_id = req_id
         ari_pro_codigo = data['ari_pro_codigo']
         ari_pro_descricao = data['ari_pro_descricao']
         ari_quantidade_requisicao = data['ari_quantidade_requisicao']
@@ -217,6 +222,7 @@ def ReqItemPost(req_id, req_emp):
         ari_datainc = datetime_atual()
         ari_usu_codigo = data['ari_usu_codigo']
         ari_terminal = data['ari_terminal']
+
         sql = """INSERT INTO ALMOXARIFADO_REQUISICAO_ITENS
                    (ARI_ID
                    ,ARI_EMP_CODIGO
@@ -260,15 +266,26 @@ def ReqItemPost(req_id, req_emp):
 
         sqlitem = execute_sql(checksql3)
 
+        item_found = False
+
         for item in sqlitem:
             if item['ARI_PRO_CODIGO'] == ari_pro_codigo:
-                return jsonify({"message": "Item já inserido na requisição, utilize as rotas de put ou patch"}), abort(
-                    500)
-            else:
-                return jsonify({"message": "Item não inserido na requisição"}), 200
+                item_found = True
+                break  # Exit the loop if the item is found
 
-        insert_sql(sql, values)
+        if item_found:
+            return jsonify(
+                {"message": "Item já inserido na requisição, utilize as rotas de put ou patch", "status": 500}), 200
+        else:
+            insert_sql(sql, values)
 
+        checksql6 = "SELECT ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITEMS WHERE ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_ID = {}".format(
+            req_id, req_emp, nilast)
+        checkdado = execute_sql(checksql6)
+        if not checkdado:
+            return jsonify({"message": "Inserção de item falhou", "status": 500}), 200
+        else:
+            return jsonify({"message": "Inserção de item realizada com sucesso", "status": 200}), 200
     except Exception as e:
         print(e), abort(500)
 

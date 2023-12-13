@@ -282,13 +282,66 @@ def ReqItemPost(req_id, req_emp):
         else:
             insert_sql(sql, values)
 
-        checksql6 = "SELECT ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(req_id, req_emp, nilast)
+        checksql6 = "SELECT ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+            req_id, req_emp, nilast)
         checkdado = execute_sql(checksql6)
         if not checkdado:
             print(checkdado)
             return jsonify({"message": "Inserção de item falhou", "status": 500}), 200
         else:
             return jsonify({"message": "Inserção de item realizada com sucesso", "status": 200}), 200
+
+    except Exception as e:
+        print(e), abort(500)
+
+
+@api.route('/API/reqput/<req_id>/<req_emp>', methods=['PUT'])
+def reqput(req_id, req_emp):
+    try:
+        checksql1 = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(req_id, req_emp)
+        existecheck = execute_sql(checksql1)
+        if not existecheck:
+            return jsonify({"message": "Requisição inexistente", "status": 500}), 200
+
+        data = request.get_json()
+
+        are_emp_codigo = data['are_emp_codigo']
+        are_responsavel = data['are_responsavel']
+        are_solicitante = data['are_solicitante']
+        are_lap_id = data['are_lap_id']
+        are_lap_descricao = data['are_lap_descricao']
+        are_descricao_uso = data['are_descricao_uso']
+        are_status = data['are_status']
+        are_usu_requisicao = data['are_usu_requisicao']
+        are_usu_liberacao = data['are_usu_liberacao']
+        are_terminal_requisicao = data['are_terminal_requisicao']
+        are_terminal_liberacao = data['are_terminal_liberacao']
+        are_datainc = datetime_atual()
+        are_observacao = data['are_observacao']
+        are_tipo = data['are_tipo']
+        are_ordem_producao = data['are_ordem_producao']
+        are_centro_custo = data['are_centro_custo']
+
+        checksql2 = "SELECT are_emp_codigo, are_responsavel, are_solicitante, are_lap_id, are_lap_descricao, are_descricao_uso, are_status, are_usu_requisicao, are_usu_liberacao, are_terminal_requisicao, are_terminal_liberacao, are_observacao, are_tipo, are_ordem_producao, are_centro_custo FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(
+            req_id, req_emp)
+        dadosret = execute_sql(checksql2)
+
+        sql = "UPDATE ALMOXARIFADO_REQUISICAO SET ARE_EMP_CODIGO = ? , ARE_DATA_SOLICITACAO = ?, ARE_RESPONSAVEL = ?, ARE_SOLICITANTE = ?, ARE_LAP_ID = ?, ARE_LAP_DESCRICAO = ?, ARE_DESCRICAO_USO = ?, ARE_STATUS = ?, ARE_USU_REQUISICAO = ?, ARE_USU_LIBERACAO = ?, ARE_TERMINAL_REQUISICAO = ?,ARE_TERMINAL_LIBERACAO = ?,ARE_DATAINC = ?,ARE_OBSERVACAO = ?,ARE_TIPO = ?,ARE_ORDEM_PRODUCAO = ?,ARE_CENTRO_CUSTO = ? WHERE ARE_ID = ? AND ARE_EMP_CODIGO = ?"
+        params = (are_emp_codigo, datetime_atual(), are_responsavel, are_solicitante, are_lap_id, are_lap_descricao, are_descricao_uso, are_status,are_usu_requisicao, are_usu_liberacao, are_terminal_requisicao, are_terminal_liberacao, are_datainc, are_observacao, are_tipo, are_ordem_producao, are_centro_custo, req_id, req_emp)
+        insert_sql(sql, params)
+
+        dadosret2 = execute_sql(checksql2)
+        mudanca = False
+
+        for indice, dado1 in enumerate(dadosret):
+            if dadosret2[indice] != dado1:
+                mudanca = True
+                break
+
+        if mudanca:
+            return jsonify({"message": "Mudança realizada com sucesso", "status": 200}), 200
+        else:
+            return jsonify({"message": "Não houve mudanças nos dados(exceção de are_data_inc e are_data_solicitaçao)", "status": 500}), 200
 
     except Exception as e:
         print(e), abort(500)

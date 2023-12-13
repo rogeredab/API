@@ -11,8 +11,7 @@ def getTodasReq():
         sql = "SELECT * FROM ALMOXARIFADO_REQUISICAO"
         dados = execute_sql(sql)
         if not dados:
-            print("Não foi encontrado dados nesses params")
-            abort(404)
+            return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
     except Exception as e:
         print("Erro: ", e)
@@ -26,8 +25,7 @@ def getItensReq(req_id, req_emp):
                                                                                                                  req_emp)
         dados = execute_sql(sql)
         if not dados:
-            print("Não foi encontrado dados nesses params")
-            abort(404)
+            return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
     except Exception as e:
         print("Erro: ", e)
@@ -40,8 +38,7 @@ def getReqEsp(req_id, req_emp):
         sql = "SELECT * FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} and are_emp_codigo = {}".format(req_id, req_emp)
         dados = execute_sql(sql)
         if not dados:
-            print("Não foi encontrado dados nesses params")
-            abort(404)
+            return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
     except Exception as e:
         print("Erro:", e)
@@ -55,8 +52,7 @@ def getReqRet(req_id, req_emp):
               "ARR_ARI_ID where ARI_ARE_ID = {} and ARI_EMP_CODIGO = {}".format(req_id, req_emp)
         dados = execute_sql(sql)
         if not dados:
-            print("Não foi encontrado dados nesses params")
-            abort(404)
+            return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
     except Exception as e:
         print("Erro", e)
@@ -165,7 +161,7 @@ def ReqPost():
 
     except Exception as e:
         print("Erro", e)
-        return jsonify({"message": "Inserção falhou"}), 500
+        return jsonify({"message": "Inserção falhou" }), 500
 
 
 @api.route('/API/reqitenpost/<req_id>/<req_emp>', methods=['POST'])
@@ -176,7 +172,7 @@ def ReqItemPost(req_id, req_emp):
         dados = execute_sql(checksql)
         if not dados:
             return jsonify(
-                {"message": "Requisição inexistente ou código da empresa informado incorretamente", "status": 404}), 200
+                {"message": "Requisição inexistente ou código da empresa informado incorretamente"}), 404
 
         checksql2 = "SELECT ARE_STATUS FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(
             req_id, req_emp)
@@ -185,9 +181,9 @@ def ReqItemPost(req_id, req_emp):
         status = int(sqlstatus[0]['ARE_STATUS'])
 
         if status == 3:
-            return jsonify({"message": "Requisição se encontra cancelada", "status": 500}), 200
+            return jsonify({"message": "Requisição se encontra cancelada"}), 500
         elif status == 2:
-            return jsonify({"message": "Requisição já foi retirada", "status": 500}), 200
+            return jsonify({"message": "Requisição já foi retirada"}), 500
 
         checksql4 = "SELECT TOP 1 ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} ORDER BY ARI_ID " \
                     "DESC".format(
@@ -278,7 +274,7 @@ def ReqItemPost(req_id, req_emp):
 
         if item_found:
             return jsonify(
-                {"message": "Item já inserido na requisição, utilize as rotas de put ou patch", "status": 500}), 200
+                {"message": "Item já inserido na requisição, utilize as rotas de put ou patch"}), 500
         else:
             insert_sql(sql, values)
 
@@ -287,9 +283,9 @@ def ReqItemPost(req_id, req_emp):
         checkdado = execute_sql(checksql6)
         if not checkdado:
             print(checkdado)
-            return jsonify({"message": "Inserção de item falhou", "status": 500}), 200
+            return jsonify({"message": "Inserção de item falhou"}), 500
         else:
-            return jsonify({"message": "Inserção de item realizada com sucesso", "status": 200}), 200
+            return jsonify({"message": "Inserção de item realizada com sucesso"}), 200
 
     except Exception as e:
         print(e), abort(500)
@@ -301,7 +297,7 @@ def reqput(req_id, req_emp):
         checksql1 = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(req_id, req_emp)
         existecheck = execute_sql(checksql1)
         if not existecheck:
-            return jsonify({"message": "Requisição inexistente", "status": 500}), 200
+            return jsonify({"message": "Requisição inexistente"}), 500
 
         data = request.get_json()
 
@@ -339,9 +335,9 @@ def reqput(req_id, req_emp):
                 break
 
         if mudanca:
-            return jsonify({"message": "Mudança realizada com sucesso", "status": 200}), 200
+            return jsonify({"message": "Mudança realizada com sucesso"}), 200
         else:
-            return jsonify({"message": "Não houve mudanças nos dados(exceção de are_data_inc e are_data_solicitaçao)", "status": 500}), 200
+            return jsonify({"message": "Não houve mudanças nos dados(exceção de are_data_inc e are_data_solicitaçao)"}), 500
 
     except Exception as e:
         print(e), abort(500)

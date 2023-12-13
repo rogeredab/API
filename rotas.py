@@ -189,12 +189,14 @@ def ReqItemPost(req_id, req_emp):
         elif status == 2:
             return jsonify({"message": "Requisição já foi retirada", "status": 500}), 200
 
-        checksql4 = "SELECT TOP 1 ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} ORDER BY ARI_ID DESC".format(
+        checksql4 = "SELECT TOP 1 ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} ORDER BY ARI_ID " \
+                    "DESC".format(
             req_emp)
         ari_idplus = execute_sql(checksql4)
         last = int(ari_idplus[0]['ARI_ID']) + 1
 
-        checksql5 = "SELECT TOP 1 ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} AND ARI_ARE_ID = {} ORDER BY ARI_ID DESC".format(
+        checksql5 = "SELECT TOP 1 ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_EMP_CODIGO = {} AND ARI_ARE_ID " \
+                    "= {} ORDER BY ARI_ID DESC".format(
             req_emp, req_id)
         ari_niplus = execute_sql(checksql5)
         nilast = ''
@@ -261,7 +263,8 @@ def ReqItemPost(req_id, req_emp):
             ari_usu_codigo, ari_terminal
         )
 
-        checksql3 = "SELECT ARI_PRO_CODIGO FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {}".format(
+        checksql3 = "SELECT ARI_PRO_CODIGO FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND " \
+                    "ARI_EMP_CODIGO = {}".format(
             req_id, req_emp)
 
         sqlitem = execute_sql(checksql3)
@@ -271,7 +274,7 @@ def ReqItemPost(req_id, req_emp):
         for item in sqlitem:
             if item['ARI_PRO_CODIGO'] == ari_pro_codigo:
                 item_found = True
-                break  # Exit the loop if the item is found
+                break
 
         if item_found:
             return jsonify(
@@ -279,13 +282,14 @@ def ReqItemPost(req_id, req_emp):
         else:
             insert_sql(sql, values)
 
-        checksql6 = "SELECT ARI_ID FROM ALMOXARIFADO_REQUISICAO_ITEMS WHERE ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_ID = {}".format(
-            req_id, req_emp, nilast)
+        checksql6 = "SELECT ARI_NI FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(req_id, req_emp, nilast)
         checkdado = execute_sql(checksql6)
         if not checkdado:
+            print(checkdado)
             return jsonify({"message": "Inserção de item falhou", "status": 500}), 200
         else:
             return jsonify({"message": "Inserção de item realizada com sucesso", "status": 200}), 200
+
     except Exception as e:
         print(e), abort(500)
 

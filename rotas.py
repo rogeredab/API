@@ -342,6 +342,32 @@ def reqput(req_id, req_emp):
     except Exception as e:
         print(e), abort(500)
 
+@api.route('/API/reqitemput/<req_id>/<req_emp>/<req_item_n>/<campo>', methods=['PATCH'])
+def reqitemput(req_id, req_emp, req_item_n, campo):
+    try:
+        if campo == 'ari_pro_codigo':
+            return jsonify({"message": "Não é possivel alterar o código do produto"}), 403
+        elif campo == 'ari_id' or campo == 'ari_are_id':
+            return jsonify({"message": "Não é possivel alterar códigos identificadores da requisição"}), 403
+        elif campo == 'ari_ni':
+            return jsonify({"message": "Não é possivel alterar a posição do item"}), 403
+        elif campo == 'ari_datainc':
+            return jsonify({"message" : "Não é possivel alterar a data de inclusão"}), 403
+        else:
+            pass
+
+        valores_alteraveis = ['ARI_PRO_CODIGO','ARI_PRO_DESCRICAO', 'ARI_QUANTIDADE_REQUISICAO','ARI_QUANTIDADE_RETIRADA', 'ARI_CUSTO_UNITARIO', 'ARI_CUSTO_TOTAL', 'ARI_OBSERVACAO', 'ARI_STATUS', 'ARI_USU_CODIGO', 'ARI_TERMINAL']
+        if campo not in valores_alteraveis:
+            return jsonify({"message": "Campo desconhecido"}), 400
+        else:
+            pass
+
+        checksql1 = "SELECT are_ni FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(req_id, req_emp, req_item_n)
+        existesql = execute_sql(checksql1)
+        if not existesql:
+            return jsonify({"message" : "Número de item informado inexistente ou informado incorretamente"}), 404
+        else:
+            pass
 
 if __name__ == '__main__':
     api.run(debug=True)

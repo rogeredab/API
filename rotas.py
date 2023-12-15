@@ -161,7 +161,7 @@ def ReqPost():
 
     except Exception as e:
         print("Erro", e)
-        return jsonify({"message": "Inserção falhou" }), 500
+        return jsonify({"message": "Inserção falhou"}), 500
 
 
 @api.route('/API/reqitenpost/<req_id>/<req_emp>', methods=['POST'])
@@ -294,7 +294,8 @@ def ReqItemPost(req_id, req_emp):
 @api.route('/API/reqput/<req_id>/<req_emp>', methods=['PUT'])
 def reqput(req_id, req_emp):
     try:
-        checksql1 = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(req_id, req_emp)
+        checksql1 = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(
+            req_id, req_emp)
         existecheck = execute_sql(checksql1)
         if not existecheck:
             return jsonify({"message": "Requisição inexistente"}), 500
@@ -323,7 +324,10 @@ def reqput(req_id, req_emp):
         dadosret = execute_sql(checksql2)
 
         sql = "UPDATE ALMOXARIFADO_REQUISICAO SET ARE_EMP_CODIGO = ? , ARE_DATA_SOLICITACAO = ?, ARE_RESPONSAVEL = ?, ARE_SOLICITANTE = ?, ARE_LAP_ID = ?, ARE_LAP_DESCRICAO = ?, ARE_DESCRICAO_USO = ?, ARE_STATUS = ?, ARE_USU_REQUISICAO = ?, ARE_USU_LIBERACAO = ?, ARE_TERMINAL_REQUISICAO = ?,ARE_TERMINAL_LIBERACAO = ?,ARE_DATAINC = ?,ARE_OBSERVACAO = ?,ARE_TIPO = ?,ARE_ORDEM_PRODUCAO = ?,ARE_CENTRO_CUSTO = ? WHERE ARE_ID = ? AND ARE_EMP_CODIGO = ?"
-        params = (are_emp_codigo, datetime_atual(), are_responsavel, are_solicitante, are_lap_id, are_lap_descricao, are_descricao_uso, are_status,are_usu_requisicao, are_usu_liberacao, are_terminal_requisicao, are_terminal_liberacao, are_datainc, are_observacao, are_tipo, are_ordem_producao, are_centro_custo, req_id, req_emp)
+        params = (are_emp_codigo, datetime_atual(), are_responsavel, are_solicitante, are_lap_id, are_lap_descricao,
+                  are_descricao_uso, are_status, are_usu_requisicao, are_usu_liberacao, are_terminal_requisicao,
+                  are_terminal_liberacao, are_datainc, are_observacao, are_tipo, are_ordem_producao, are_centro_custo,
+                  req_id, req_emp)
         insert_sql(sql, params)
 
         dadosret2 = execute_sql(checksql2)
@@ -337,14 +341,20 @@ def reqput(req_id, req_emp):
         if mudanca:
             return jsonify({"message": "Mudança realizada com sucesso"}), 200
         else:
-            return jsonify({"message": "Não houve mudanças nos dados(exceção de are_data_inc e are_data_solicitaçao)"}), 500
+            return jsonify(
+                {"message": "Não houve mudanças nos dados(exceção de are_data_inc e are_data_solicitaçao)"}), 500
 
     except Exception as e:
         print(e), abort(500)
 
-@api.route('/API/reqitemput/<req_id>/<req_emp>/<req_item_n>/<campo>', methods=['PATCH'])
-def reqitemput(req_id, req_emp, req_item_n, campo):
+
+@api.route('/API/reqitempatch/<req_id>/<req_emp>/<req_item_n>', methods=['PATCH'])
+def reqitempatch(req_id, req_emp, req_item_n):
     try:
+        data = request.get_json()
+        campo = data['campoalterar']
+        datacampo = data[campo]
+
         if campo == 'ari_pro_codigo':
             return jsonify({"message": "Não é possivel alterar o código do produto"}), 403
         elif campo == 'ari_id' or campo == 'ari_are_id':
@@ -352,22 +362,44 @@ def reqitemput(req_id, req_emp, req_item_n, campo):
         elif campo == 'ari_ni':
             return jsonify({"message": "Não é possivel alterar a posição do item"}), 403
         elif campo == 'ari_datainc':
-            return jsonify({"message" : "Não é possivel alterar a data de inclusão"}), 403
+            return jsonify({"message": "Não é possivel alterar a data de inclusão"}), 403
         else:
             pass
 
-        valores_alteraveis = ['ARI_PRO_CODIGO','ARI_PRO_DESCRICAO', 'ARI_QUANTIDADE_REQUISICAO','ARI_QUANTIDADE_RETIRADA', 'ARI_CUSTO_UNITARIO', 'ARI_CUSTO_TOTAL', 'ARI_OBSERVACAO', 'ARI_STATUS', 'ARI_USU_CODIGO', 'ARI_TERMINAL']
+        valores_alteraveis = ['ARI_PRO_CODIGO', 'ARI_PRO_DESCRICAO', 'ARI_QUANTIDADE_REQUISICAO',
+                              'ARI_QUANTIDADE_RETIRADA', 'ARI_CUSTO_UNITARIO', 'ARI_CUSTO_TOTAL', 'ARI_OBSERVACAO',
+                              'ARI_STATUS', 'ARI_USU_CODIGO', 'ARI_TERMINAL']
         if campo not in valores_alteraveis:
             return jsonify({"message": "Campo desconhecido"}), 400
         else:
             pass
 
-        checksql1 = "SELECT are_ni FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(req_id, req_emp, req_item_n)
+        checksql1 = "SELECT are_ni FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+            req_id, req_emp, req_item_n)
         existesql = execute_sql(checksql1)
         if not existesql:
-            return jsonify({"message" : "Número de item informado inexistente ou informado incorretamente"}), 404
+            return jsonify({"message": "Número de item informado inexistente ou informado incorretamente"}), 404
         else:
             pass
+
+        checksql2 = "SELECT {} FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+            campo, req_id, req_emp, req_item_n)
+        check1 = execute_sql(checksql2)
+
+        sql = "UPDATE ALMOXARIFADO_REQUISICAO_ITENS SET {} = {} WWHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}"
+        params = (campo, datacampo, req_id, req_emp, req_item_n)
+        insert_sql(sql, params)
+
+        check2 = execute_sql(checksql2)
+
+        if check2 == check1:
+            return jsonify({"message": "Não houve mudanças"}), 304
+        else:
+            return jsonify({"message": "Mudanças realizadas com sucesso"}), 200
+
+    except Exception as e:
+        print(e), abort(500)
+
 
 if __name__ == '__main__':
     api.run(debug=True)

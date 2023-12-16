@@ -403,5 +403,52 @@ def reqitempatch(req_id, req_emp, req_item_n):
         print(e), abort(500)
 
 
+@api.route('/API/reqitemput/<req_id>/<req_emp>/<req_item_n>', methods=['PUT'])
+def reqitemput(req_id, req_emp, req_item_n):
+    try:
+        checksql1 = "SELECT ARI_ARE_ID FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+            req_id, req_emp, req_item_n)
+        existecheck = execute_sql(checksql1)
+        if not existecheck:
+            return jsonify({"message": "Requisição inexistente"}), 500
+
+        data = request.get_json()
+
+        ari_pro_codigo = data['ari_pro_codigo']
+        ari_pro_descricao = data['ari_pro_descricao']
+        ari_quantidade_requisicao = data['ari_quantidade_requisicao']
+        ari_quantidade_retirada = data['ari_quantidade_retirada']
+        ari_custo_unitario = data['ari_custo_unitario']
+        ari_custo_total = data['ari_custo_total']
+        ari_observacao = data['ari_observacao']
+        ari_status = data['ari_status']
+        ari_usu_codigo = data['ari_usu_codigo']
+        ari_terminal = data['ari_terminal']
+
+        checksql2 = "SELECT ARI_EMP_CODIGO, ARI_PRO_CODIGO, ARI_PRO_DESCRICAO, ARI_QUANTIDADE_REQUISICAO, ARI_QUANTIDADE_RETIRADA, ARI_CUSTO_UNITARIO, ARI_CUSTO_TOTAL, ARI_OBSERVACAO, ARI_STATUS, ARI_USU_CODIGO, ARI_TERMINAL FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+            req_id, req_emp, req_item_n)
+        dadosret = execute_sql(checksql2)
+
+        sql = "UPDATE ALMOXARIFADO_REQUISICAO_ITENS SET  ARI_PRO_CODIGO = {}, ARI_PRO_DESCRICAO = '{}', ARI_QUANTIDADE_REQUISICAO = {}, ARI_QUANTIDADE_RETIRADA = {}, ARI_CUSTO_UNITARIO = {}, ARI_CUSTO_TOTAL = {}, ARI_OBSERVACAO = '{}', ARI_STATUS = {}, ARI_USU_CODIGO = {}, ARI_TERMINAL = {} WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(ari_pro_codigo, ari_pro_descricao, ari_quantidade_requisicao, ari_quantidade_retirada,ari_custo_unitario, ari_custo_total, ari_observacao, ari_status, ari_usu_codigo, ari_terminal, req_id, req_emp, req_item_n)
+        delete_sql(sql)
+
+        dadosret2 = execute_sql(checksql2)
+        mudanca = False
+
+        for indice, dado1 in enumerate(dadosret):
+            if dadosret2[indice] != dado1:
+                mudanca = True
+                break
+
+        if mudanca:
+            return jsonify({"message": "Mudança realizada com sucesso"}), 200
+        else:
+            return jsonify(
+                {"message": "Não houve mudanças nos dados(exceção de are_data_inc e are_data_solicitaçao)"}), 500
+
+    except Exception as e:
+        print(e), abort(500)
+
+
 if __name__ == '__main__':
     api.run(debug=True)

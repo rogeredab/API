@@ -351,30 +351,31 @@ def reqput(req_id, req_emp):
 @api.route('/API/reqitempatch/<req_id>/<req_emp>/<req_item_n>', methods=['PATCH'])
 def reqitempatch(req_id, req_emp, req_item_n):
     try:
-        data = request.get_json()
-        campo = data['campoalterar']
-        datacampo = data[campo]
 
-        if campo == 'ari_pro_codigo':
+        data = request.get_json()
+        campo = data["campoalterar"]
+        datacampo = data["novovalor"]
+
+        if campo == 'ari_pro_codigo' or campo == 'ARI_PRO_CODIGO':
             return jsonify({"message": "Não é possivel alterar o código do produto"}), 403
-        elif campo == 'ari_id' or campo == 'ari_are_id':
+        elif campo == 'ari_id' or campo == 'ARI_ID' or campo == 'ari_are_id' or campo == 'ARI_ARE_ID':
             return jsonify({"message": "Não é possivel alterar códigos identificadores da requisição"}), 403
-        elif campo == 'ari_ni':
+        elif campo == 'ari_ni' or campo == 'ARI_NI':
             return jsonify({"message": "Não é possivel alterar a posição do item"}), 403
-        elif campo == 'ari_datainc':
+        elif campo == 'ari_datainc' or campo == 'ARI_DATAINC':
             return jsonify({"message": "Não é possivel alterar a data de inclusão"}), 403
         else:
             pass
 
-        valores_alteraveis = ['ARI_PRO_CODIGO', 'ARI_PRO_DESCRICAO', 'ARI_QUANTIDADE_REQUISICAO',
-                              'ARI_QUANTIDADE_RETIRADA', 'ARI_CUSTO_UNITARIO', 'ARI_CUSTO_TOTAL', 'ARI_OBSERVACAO',
-                              'ARI_STATUS', 'ARI_USU_CODIGO', 'ARI_TERMINAL']
+        valores_alteraveis = ['ARI_PRO_DESCRICAO', 'ARI_QUANTIDADE_REQUISICAO', 'ARI_QUANTIDADE_RETIRADA',
+                              'ARI_CUSTO_UNITARIO', 'ARI_CUSTO_TOTAL', 'ARI_OBSERVACAO', 'ARI_STATUS', 'ARI_USU_CODIGO',
+                              'ARI_TERMINAL']
         if campo not in valores_alteraveis:
             return jsonify({"message": "Campo desconhecido"}), 400
         else:
             pass
 
-        checksql1 = "SELECT are_ni FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+        checksql1 = "SELECT ari_ni FROM ALMOXARIFADO_REQUISICAO_ITENS WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
             req_id, req_emp, req_item_n)
         existesql = execute_sql(checksql1)
         if not existesql:
@@ -386,16 +387,17 @@ def reqitempatch(req_id, req_emp, req_item_n):
             campo, req_id, req_emp, req_item_n)
         check1 = execute_sql(checksql2)
 
-        sql = "UPDATE ALMOXARIFADO_REQUISICAO_ITENS SET {} = {} WWHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}"
-        params = (campo, datacampo, req_id, req_emp, req_item_n)
-        insert_sql(sql, params)
+        sql = "UPDATE ALMOXARIFADO_REQUISICAO_ITENS SET {} = {} WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+            campo, datacampo, req_id, req_emp, req_item_n)
+        delete_sql(sql)
 
         check2 = execute_sql(checksql2)
 
-        if check2 == check1:
-            return jsonify({"message": "Não houve mudanças"}), 304
-        else:
+        if check2 != check1:
+
             return jsonify({"message": "Mudanças realizadas com sucesso"}), 200
+        elif check2 == check1:
+            return 304
 
     except Exception as e:
         print(e), abort(500)

@@ -1,4 +1,4 @@
-from flask import Flask, abort, jsonify, request
+from flask import Flask, abort, jsonify, request, make_response
 from func import execute_sql, delete_sql, insert_sql
 from func import datetime_atual
 
@@ -429,7 +429,9 @@ def reqitemput(req_id, req_emp, req_item_n):
             req_id, req_emp, req_item_n)
         dadosret = execute_sql(checksql2)
 
-        sql = "UPDATE ALMOXARIFADO_REQUISICAO_ITENS SET  ARI_PRO_CODIGO = {}, ARI_PRO_DESCRICAO = '{}', ARI_QUANTIDADE_REQUISICAO = {}, ARI_QUANTIDADE_RETIRADA = {}, ARI_CUSTO_UNITARIO = {}, ARI_CUSTO_TOTAL = {}, ARI_OBSERVACAO = '{}', ARI_STATUS = {}, ARI_USU_CODIGO = {}, ARI_TERMINAL = {} WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(ari_pro_codigo, ari_pro_descricao, ari_quantidade_requisicao, ari_quantidade_retirada,ari_custo_unitario, ari_custo_total, ari_observacao, ari_status, ari_usu_codigo, ari_terminal, req_id, req_emp, req_item_n)
+        sql = "UPDATE ALMOXARIFADO_REQUISICAO_ITENS SET  ARI_PRO_CODIGO = {}, ARI_PRO_DESCRICAO = '{}', ARI_QUANTIDADE_REQUISICAO = {}, ARI_QUANTIDADE_RETIRADA = {}, ARI_CUSTO_UNITARIO = {}, ARI_CUSTO_TOTAL = {}, ARI_OBSERVACAO = '{}', ARI_STATUS = {}, ARI_USU_CODIGO = {}, ARI_TERMINAL = {} WHERE ARI_ARE_ID = {} AND ARI_EMP_CODIGO = {} AND ARI_NI = {}".format(
+            ari_pro_codigo, ari_pro_descricao, ari_quantidade_requisicao, ari_quantidade_retirada, ari_custo_unitario,
+            ari_custo_total, ari_observacao, ari_status, ari_usu_codigo, ari_terminal, req_id, req_emp, req_item_n)
         delete_sql(sql)
 
         dadosret2 = execute_sql(checksql2)
@@ -445,6 +447,54 @@ def reqitemput(req_id, req_emp, req_item_n):
         else:
             return jsonify(
                 {"message": "Não houve mudanças nos dados(exceção de are_data_inc e are_data_solicitaçao)"}), 500
+
+    except Exception as e:
+        print(e), abort(500)
+
+
+@api.route('/API/reqpatch/<req_id>/<req_emp>', methods=['PATCH'])
+def reqpatch(req_id, req_emp):
+    try:
+
+        data = request.get_json()
+        campo = data["campoalterar"]
+        datacampo = data["novovalor"]
+
+        if campo == 'are_tipo' or campo == 'ARE_TIPO':
+            return jsonify({"message": "Não é possivel alterar o tipo da requisicao"}), 403
+        elif campo == 'are_id' or campo == 'ARE_ID' or campo == 'are_lap_id' or campo == 'ARE_LAP_ID':
+            return jsonify({"message": "Não é possivel alterar códigos identificadores da requisição"}), 403
+        else:
+            pass
+
+        valores_alteraveis = ['ARE_RESPONSAVEL','ARE_SOLICITANTE','ARE_DESCRICAO_USO','ARE_STATUS','ARE_USU_REQUISICAO','ARE_USU_LIBERACAO','ARE_TERMINAL_REQUISICAO','ARE_TERMINAL_LIBERACAO','ARE_OBSERVACAO','ARE_ORDEM_PRODUCAO','ARE_CENTRO_CUSTO']
+        if campo not in valores_alteraveis:
+            return jsonify({"message": "Campo desconhecido"}), 400
+        else:
+            pass
+
+        checksql1 = "SELECT ARE_ID FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(
+            req_id, req_emp)
+        existesql = execute_sql(checksql1)
+        if not existesql:
+            return jsonify({"message": "Requisição inexistente ou informado incorretamente"}), 404
+        else:
+            pass
+
+        checksql2 = "SELECT {} FROM ALMOXARIFADO_REQUISICAO WHERE ARE_ID = {} AND ARE_EMP_CODIGO = {}".format(
+            campo, req_id, req_emp)
+        check1 = execute_sql(checksql2)
+
+        sql = "UPDATE ALMOXARIFADO_REQUISICAO SET {} = {} WHERE ARE_ID = {} AND ARe_EMP_CODIGO = {}".format(
+            campo, datacampo, req_id, req_emp)
+        delete_sql(sql)
+
+        check2 = execute_sql(checksql2)
+        if check2 != check1:
+
+            return jsonify({"message": "Mudanças realizadas com sucesso"}), 200
+        elif check2 == check1:
+            return jsonify({"message": "Nenhuma mudança detectada"})
 
     except Exception as e:
         print(e), abort(500)

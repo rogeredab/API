@@ -1,10 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, SmallInteger
 from sqlalchemy.ext.declarative import declarative_base
-from conn import criar_conexao
 
 Base = declarative_base()
-
-session = criar_conexao()
 
 
 class Almoxarifado_requisicao(Base):
@@ -29,3 +26,6 @@ class Almoxarifado_requisicao(Base):
     ARE_TIPO = Column(SmallInteger)
     ARE_ORDEM_PRODUCAO = Column(Integer)
     ARE_CENTRO_CUSTO = Column(Integer)
+
+    def as_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}

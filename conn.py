@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 import configparser
+from sqlalchemy.orm import sessionmaker
 
 
 def criar_conexao():
@@ -15,8 +16,9 @@ def criar_conexao():
     connection_string = f"{driver}://{user}:{password}@{server}/{database}"
 
     engine = create_engine(connection_string)
-    connection = engine.connect()
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
-    return connection
+    return session
 
 

@@ -1,7 +1,6 @@
-from flask import Flask, abort, jsonify, request, make_response
+from flask import Flask, abort, jsonify, request
 from func import execute_sql, delete_sql, insert_sql
 from func import datetime_atual
-
 api = Flask(__name__)
 
 

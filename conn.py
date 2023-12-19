@@ -1,24 +1,26 @@
+from sqlalchemy.engine import URL
 from sqlalchemy import create_engine
-import configparser
 from sqlalchemy.orm import sessionmaker
 
 
-def criar_conexao():
-    config = configparser.ConfigParser()
-    config.read('config.ini')
+def db():
+    # Configuração da conexão
+    connection_url = URL.create(
+        "mssql+pyodbc",
+        username="sa",
+        password="omni@50ftp4r",
+        host="localhost",
+        port=1433,
+        database="12001",
+        query={
+            "driver": "ODBC Driver 18 for SQL Server",
+            "TrustServerCertificate": "yes",
+            "authentication": "ActiveDirectoryIntegrated",
+        },
+    )
+    engine = create_engine(connection_url)
 
-    driver = config['BANCO_DE_DADOS']['driver']
-    server = config['BANCO_DE_DADOS']['server']
-    database = config['BANCO_DE_DADOS']['database']
-    user = config['BANCO_DE_DADOS']['user']
-    password = config['BANCO_DE_DADOS']['password']
-
-    connection_string = f"{driver}://{user}:{password}@{server}/{database}"
-
-    engine = create_engine(connection_string)
     Session = sessionmaker(bind=engine)
     session = Session()
 
     return session
-
-

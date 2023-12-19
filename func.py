@@ -1,37 +1,34 @@
 from conn import db
-from datetime import datetime
 
 
-def execute_sql(sql):
-    conn = db()
-    dados = []
-    cur = conn.cursor()
-    cur.execute(sql)
-    dados = cur.fetchall()
-    data_list = [dict(zip([column[0] for column in cur.description], row)) for row in dados]
-    return data_list
+def select_all(tabela):
+    lista = []
+    session = db()
+
+    try:
+        dados = session.query(tabela).all()
+        lista = [row.as_dict() for row in dados]
+
+    except Exception as e:
+        print(f"Erro ao executar a consulta: {e}")
+
+    finally:
+        # Fecha a sessão
+        session.close()
+        return lista
 
 
-def delete_sql(sql):
-    conn = db()
-    cur = conn.cursor()
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-    return 'SQL de deletar executado com sucesso '
+def select_filter(tabela, filtro):
+    session = db()
+    lista = []
+    try:
+        dados = session.query(tabela).filter(tabela.ARE_ID == filtro[0], tabela.ARE_EMP_CODIGO == filtro[1])
+        lista = [row.as_dict() for row in dados]
 
+    except Exception as e:
+        print(f"Erro ao executar a consulta: {e}")
 
-def insert_sql(sql, values):
-    conn = db()
-    cur = conn.cursor()
-    cur.execute(sql, values)
-    conn.commit()
-    cur.close()
-    conn.close()
-    return 'SQL de inserir executado com sucesso '
-
-
-def datetime_atual():
-    data_atual = datetime.now()
-    return data_atual
+    finally:
+        # Fecha a sessão
+        session.close()
+        return lista

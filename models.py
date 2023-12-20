@@ -27,6 +27,9 @@ class Almoxarifado_requisicao(Base):
     ARE_ORDEM_PRODUCAO = Column(Integer)
     ARE_CENTRO_CUSTO = Column(Integer)
 
+    def as_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
 
 class ALMOXARIFADO_REQUISICAO_ITENS(Base):
     __tablename__ = 'ALMOXARIFADO_REQUISICAO_ITENS'

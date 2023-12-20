@@ -31,7 +31,7 @@ class Almoxarifado_requisicao(Base):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 
-class ALMOXARIFADO_REQUISICAO_ITENS(Base):
+class Almoxarifado_requisicao_itens(Base):
     __tablename__ = 'ALMOXARIFADO_REQUISICAO_ITENS'
 
     ARI_ID = Column(Integer, primary_key=True)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, SmallInteger
+from sqlalchemy import Column, Integer, String, DateTime, SmallInteger, Float, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -26,6 +26,26 @@ class Almoxarifado_requisicao(Base):
     ARE_TIPO = Column(SmallInteger)
     ARE_ORDEM_PRODUCAO = Column(Integer)
     ARE_CENTRO_CUSTO = Column(Integer)
+
+
+class ALMOXARIFADO_REQUISICAO_ITENS(Base):
+    __tablename__ = 'ALMOXARIFADO_REQUISICAO_ITENS'
+
+    ARI_ID = Column(Integer, primary_key=True)
+    ARI_EMP_CODIGO = Column(Integer)
+    ARI_NI = Column(Integer)
+    ARI_ARE_ID = Column(Integer)
+    ARI_PRO_CODIGO = Column(Integer)
+    ARI_PRO_DESCRICAO = Column(String(120))
+    ARI_QUANTIDADE_REQUISICAO = Column(Float)
+    ARI_QUANTIDADE_RETIRADA = Column(Float)
+    ARI_CUSTO_UNITARIO = Column(Numeric)
+    ARI_CUSTO_TOTAL = Column(Numeric)
+    ARI_OBSERVACAO = Column(String(500))
+    ARI_STATUS = Column(Integer)
+    ARI_DATAINC = Column(DateTime)
+    ARI_USU_CODIGO = Column(Integer)
+    ARI_TERMINAL = Column(String(120))
 
     def as_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}

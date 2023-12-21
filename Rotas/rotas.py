@@ -1,6 +1,6 @@
-from flask import Flask, abort, jsonify
-from func import select_all, select_filter
-from models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens, Almoxarifado_requisicao_retirada
+from flask import Flask, jsonify
+from Controllers.func import select_all, select_filter
+from Map.models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens, Almoxarifado_requisicao_retirada
 
 api = Flask(__name__)
 

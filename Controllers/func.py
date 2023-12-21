@@ -1,5 +1,5 @@
-import models
-from conn import db
+from Map import models
+from DATABASE.conn import db
 
 
 def select_all(tabela):

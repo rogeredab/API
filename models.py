@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, SmallInteger, Float, Numeric
+from sqlalchemy import Column, Integer, String, DateTime, SmallInteger, Float, Numeric, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -31,6 +32,9 @@ class Almoxarifado_requisicao(Base):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 
+from sqlalchemy.orm import relationship
+
+
 class Almoxarifado_requisicao_itens(Base):
     __tablename__ = 'ALMOXARIFADO_REQUISICAO_ITENS'
 
@@ -50,6 +54,8 @@ class Almoxarifado_requisicao_itens(Base):
     ARI_USU_CODIGO = Column(Integer)
     ARI_TERMINAL = Column(String(120))
 
+    requisicao_retirada = relationship('Almoxarifado_requisicao_retirada', back_populates='requisicao_item')
+
     def as_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
@@ -58,7 +64,7 @@ class Almoxarifado_requisicao_retirada(Base):
     __tablename__ = 'ALMOXARIFADO_REQUISICAO_RETIRADA'
     ARR_ID = Column(Integer, primary_key=True)
     ARR_EMP_CODIGO = Column(Integer)
-    ARR_ARI_ID = Column(Integer)
+    ARR_ARI_ID = Column(Integer, ForeignKey('ALMOXARIFADO_REQUISICAO_ITENS.ARI_ID'))
     ARR_QUANTIDADE = Column(Float)
     ARR_OBSERVACAO = Column(String(500))
     ARR_EMI_RETIRADA = Column(Integer)
@@ -67,6 +73,8 @@ class Almoxarifado_requisicao_retirada(Base):
     ARR_TERMINAL = Column(String(120))
     ARE_CONTA_CONTABIL = Column(Integer)
     ARE_CENTRO_CUSTO = Column(Integer)
+
+    requisicao_item = relationship('Almoxarifado_requisicao_itens', back_populates='requisicao_retirada')
 
     def as_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}

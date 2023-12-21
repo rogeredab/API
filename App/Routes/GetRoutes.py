@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
-from Controllers.func import select_all, select_filter
-from Map.models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens, Almoxarifado_requisicao_retirada
+from App.Controllers.SelectController import SelectController
+from App.Models.models import Almoxarifado_requisicao
 
 api = Flask(__name__)
 
@@ -8,12 +8,14 @@ api = Flask(__name__)
 @api.route('/API/TodasRequisicoes', methods=['GET'])
 def getTodasReq():
     try:
-        dados = select_all(Almoxarifado_requisicao)
+        select_controller = SelectController()
+        dados = select_controller.select_all(select_controller, Almoxarifado_requisicao)
         if not dados:
-            return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
+            return jsonify({"message": "Não foram encontrados dados com esses parâmetros"}), 404
         return jsonify(dados), 200
+
     except Exception as e:
-        print("Erro: ", e)
+        print("Erro:", e)
         return 500
 
 
@@ -21,7 +23,7 @@ def getTodasReq():
 def getReq(req_id, req_emp):
     try:
         filtro = [req_id, req_emp]
-        dados = select_filter(Almoxarifado_requisicao, filtro)
+        dados = Controllers.SelectController
         if not dados:
             return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
@@ -34,7 +36,7 @@ def getReq(req_id, req_emp):
 def getReqItens(req_id, req_emp):
     try:
         filtro = [req_id, req_emp]
-        dados = select_filter(Almoxarifado_requisicao_itens, filtro)
+        dados = Controllers.SelectController
         if not dados:
             return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
@@ -47,7 +49,7 @@ def getReqItens(req_id, req_emp):
 def getReqRetirada(req_id, req_emp):
     try:
         filtro = [req_id, req_emp]
-        dados = select_filter(Almoxarifado_requisicao_retirada, filtro)
+        dados = Controllers.SelectController
         if not dados:
             return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200

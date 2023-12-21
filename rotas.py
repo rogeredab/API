@@ -43,7 +43,6 @@ def getReqItens(req_id, req_emp):
         return 500
 
 
-
 @api.route('/API/reqretirada/<req_id>/<req_emp>', methods=['GET'])
 def getReqRetirada(req_id, req_emp):
     try:
@@ -54,7 +53,7 @@ def getReqRetirada(req_id, req_emp):
         return jsonify(dados), 200
     except Exception as e:
         print("Erro: ", e)
-        return jsonify({"error": "Erro interno do servidor"}), 500
+        return 500
 
 
 if __name__ == '__main__':

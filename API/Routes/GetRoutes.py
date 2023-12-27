@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
-from App.Controllers.SelectController import SelectController
-from App.Models.models import Almoxarifado_requisicao
+from API.Controllers.SelectController import SelectController
+from API.Models.models import Almoxarifado_requisicao, Almoxarifado_requisicao_retirada, Almoxarifado_requisicao_itens
 
 api = Flask(__name__)
 
@@ -23,7 +23,8 @@ def getTodasReq():
 def getReq(req_id, req_emp):
     try:
         filtro = [req_id, req_emp]
-        dados = Controllers.SelectController
+        select_controller = SelectController()
+        dados = select_controller.select_filter(select_controller,Almoxarifado_requisicao,filtro)
         if not dados:
             return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
@@ -36,7 +37,8 @@ def getReq(req_id, req_emp):
 def getReqItens(req_id, req_emp):
     try:
         filtro = [req_id, req_emp]
-        dados = Controllers.SelectController
+        select_controller = SelectController()
+        dados = select_controller.select_filter(select_controller,Almoxarifado_requisicao_itens, filtro)
         if not dados:
             return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200
@@ -49,7 +51,8 @@ def getReqItens(req_id, req_emp):
 def getReqRetirada(req_id, req_emp):
     try:
         filtro = [req_id, req_emp]
-        dados = Controllers.SelectController
+        select_controller = SelectController()
+        dados = select_controller.select_filter(select_controller,Almoxarifado_requisicao_retirada,filtro)
         if not dados:
             return jsonify({"message": "Não foi encontrado dados nesses params"}), 404
         return jsonify(dados), 200

@@ -1,4 +1,4 @@
-from App.Models import models
+from API.Models import models
 from Config.conn import db
 
 
@@ -26,10 +26,8 @@ class SelectController:
     def select_filter(self, tabela, filtro):
         lista = []
         try:
-            if tabela in {models.Almoxarifado_requisicao, models.Almoxarifado_requisicao_itens}:
-                filtro_condicao = tabela.ARE_ID == filtro[
-                    0] if tabela == models.Almoxarifado_requisicao else tabela.ARI_ARE_ID == filtro[0]
-                dados = self.session.query(tabela).filter(filtro_condicao, tabela.ARE_EMP_CODIGO == filtro[1]).all()
+            if tabela == models.Almoxarifado_requisicao:
+                dados = self.session.query(tabela).filter(tabela.ARE_ID == filtro[0], tabela.ARE_EMP_CODIGO == filtro[1]).all()
                 lista = [row.as_dict() for row in dados]
             elif tabela == models.Almoxarifado_requisicao_retirada:
                 dados = (
@@ -41,6 +39,9 @@ class SelectController:
                     .all()
                 )
                 lista = [row[0].as_dict() for row in dados]
+            elif tabela == models.Almoxarifado_requisicao_itens:
+                dados = self.session.query(tabela).filter(tabela.ARI_ARE_ID == filtro[0], tabela.ARI_EMP_CODIGO == filtro[1]).all()
+                lista = [row.as_dict() for row in dados]
         except Exception as e:
             print(f"Erro ao executar a consulta: {e}")
         finally:

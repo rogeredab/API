@@ -37,5 +37,21 @@ def delReqItems(req_id, req_emp):
         return 500
 
 
+@api.route('/API/reqitemdel/<req_item_n>/<req_id>/<req_emp>', methods=['DELETE'])
+def delReqItem(req_item_n, req_id, req_emp):
+    try:
+        filtro = [req_item_n, req_id, req_emp]
+        delete = DeleteController()
+        dados = delete.delete_esp(delete, Almoxarifado_requisicao_itens, filtro)
+        if not dados:
+            return jsonify({"message": "Não foi possivel realizar a exclusão"}), 500
+        else:
+            return jsonify({"message": "Exclusão realizada com sucesso"}), 200
+
+    except Exception as e:
+        print("Erro: ", e)
+        return 500
+
+
 if __name__ == '__main__':
     api.run(debug=True)

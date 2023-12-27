@@ -15,14 +15,24 @@ class DeleteController:
         deleted = False
         try:
             with self.session.begin():
-                registros = self.session.query(tabela).filter(models.Almoxarifado_requisicao.ARE_ID == filtro[0], models.Almoxarifado_requisicao.ARE_EMP_CODIGO == filtro[1]).all()
-                if not registros:
-                    print("Não existem dados dentro dos parametros informados")
-                    return deleted
-                else:
-                    pass
-                for registro in registros:
-                    self.session.delete(registro)
+                if tabela == models.Almoxarifado_requisicao:
+                    registros = self.session.query(tabela).filter(tabela.ARE_ID == filtro[0], tabela.ARE_EMP_CODIGO == filtro[1]).all()
+                    if not registros:
+                        print("Não existem dados dentro dos parametros informados")
+                        return deleted
+                    else:
+                        pass
+                    for registro in registros:
+                        self.session.delete(registro)
+                elif tabela == models.Almoxarifado_requisicao_itens:
+                    registros = self.session.query(tabela).filter(tabela.ARI_ARE_ID == filtro[0], tabela.ARI_EMP_CODIGO == filtro[1]).all()
+                    if not registros:
+                        print("Não existem dados dentro dos parametros informados")
+                        return deleted
+                    else:
+                        pass
+                    for registro in registros:
+                        self.session.delete(registro)
 
             self.session.commit()
             print("Deletado com sucesso")

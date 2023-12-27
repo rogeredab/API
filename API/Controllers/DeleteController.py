@@ -35,10 +35,19 @@ class DeleteController:
                         pass
                     for registro in registros:
                         self.session.delete(registro)
+                elif tabela == models.Almoxarifado_requisicao_retirada:
+                    registros = self.session.query(tabela).filter(tabela.ARR_EMP_CODIGO == filtro[1],tabela.ARR_ARI_ID == filtro[0]).all()
+                    if not registros:
+                        print("Não existem dados dentro dos parametros informados")
+                        return deleted
+                    else:
+                        pass
+                    for registro in registros:
+                        self.session.delete(registro)
 
-            self.session.commit()
-            print("Deletado com sucesso")
-            deleted = True
+                    self.session.commit()
+                    print("Deletado com sucesso")
+                    deleted = True
 
         except Exception as e:
             print(f"Erro ao executar a exclusão: {e}")

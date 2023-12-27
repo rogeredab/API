@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from API.Controllers.SelectController import SelectController
+from API.Controllers.GetController import SelectController
 from API.Models.models import Almoxarifado_requisicao, Almoxarifado_requisicao_retirada, Almoxarifado_requisicao_itens
 
 api = Flask(__name__)

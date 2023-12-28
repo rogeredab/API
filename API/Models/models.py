@@ -8,7 +8,7 @@ Base = declarative_base()
 class Almoxarifado_requisicao(Base):
     __tablename__ = 'ALMOXARIFADO_REQUISICAO'
 
-    ARE_ID = Column(Integer, primary_key=True)
+    ARE_ID = Column(Integer, primary_key=True, autoincrement=True)
     ARE_EMP_CODIGO = Column(Integer)
     ARE_DATA_SOLICITACAO = Column(DateTime)
     ARE_DATA_RETIRADA = Column(DateTime)

@@ -18,5 +18,19 @@ def postReq():
         return 500
 
 
+@api.route("/API/reqitempost/<req_id>/<req_emp>", methods=["POST"])
+def postReqItem(req_id,req_emp):
+    filtro = [req_id, req_emp]
+    try:
+        if request.is_json:
+            dados = request.get_json()
+            post_controller = PostController()
+            info = post_controller.insert_req_item(post_controller, Almoxarifado_requisicao_itens, dados, filtro)
+            return info
+    except Exception as e:
+        print("Erro: ", e)
+        return 500
+
+
 if __name__ == '__main__':
     api.run(debug=True)

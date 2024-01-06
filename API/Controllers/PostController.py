@@ -1,6 +1,4 @@
 from flask import jsonify
-from sqlalchemy import desc
-
 from API.Models import models
 from API.Models.models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens
 from API.Services.DateTime import get_current_date

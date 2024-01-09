@@ -19,5 +19,19 @@ def putReq(req_id, req_emp):
         return 500
 
 
+@api.route("/API/reqitemput/<req_id>/<req_emp>/<req_item_id>", methods=['PUT'])
+def putItemReq(req_id, req_emp, req_item_id):
+    filtro = [req_id,req_emp,req_item_id]
+    try:
+        if request.is_json:
+            dados = request.get_json()
+            put_controller = PutController()
+            info = put_controller.put_reqitem(put_controller, Almoxarifado_requisicao_itens, dados, filtro)
+            return info
+    except Exception as e:
+        print("Erro: ", e)
+        return 500
+
+
 if __name__ == '__main__':
     api.run(debug=True)

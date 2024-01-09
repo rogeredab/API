@@ -1,6 +1,5 @@
 from flask import jsonify
 from API.Models import models
-from API.Models.models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens
 from API.Services.DateTime import get_current_date
 from Config.conn import db
 
@@ -42,6 +41,39 @@ class PutController:
                     self.session.commit()
 
                 return jsonify({"message": "Modificações realizadas"}), 200
+
+        except Exception as e:
+            print(e)
+
+    @staticmethod
+    def put_reqitem(self, tabela, dados, filtro):
+        try:
+            if tabela == models.Almoxarifado_requisicao_itens:
+                queryput = self.session.query(tabela).filter_by(ARI_ARE_ID=filtro[0], ARI_EMP_CODIGO=filtro[1],
+                                                                ARI_NI=filtro[2])
+                if not queryput:
+                    return jsonify({"message": "Requisição inexistente ou parametros inválidos"}), 404
+                else:
+                    itemcheck = self.session.query(tabela.ARI_NI).filter_by(ARI_ARE_ID=filtro[0],
+                                                                            ARI_EMP_CODIGO=filtro[1],
+                                                                            ARI_NI=filtro[2])
+                    if not itemcheck:
+                        return jsonify({"message": "Requisição inexistente ou parametros inválidos"}), 404
+                    else:
+                        queryput.ARI_PRO_CODIGO = dados['ari_pro_codigo']
+                        queryput.ARI_PRO_DESCRICAO = dados['ari_pro_descricao']
+                        queryput.ARI_QUANTIDADE_REQUISICAO = dados['ari_quantidade_requisicao']
+                        queryput.ARI_QUANTIDADE_RETIRADA = dados['ari_quantidade_retirada']
+                        queryput.ARI_CUSTO_UNITARIO = dados['ari_custo_unitario']
+                        queryput.ARI_CUSTO_TOTAL = dados['ari_custo_total']
+                        queryput.ARI_OBSERVACAO = dados['ari_observacao']
+                        queryput.ARI_STATUS = dados['ari_status']
+                        queryput.ARI_USU_CODIGO = dados['ari_usu_codigo']
+                        queryput.ARI_TERMINAL = dados['ari_terminal']
+                        queryput.ARI_DATAINC = get_current_date()
+                        self.session.commit()
+
+            return jsonify({"message": "Modificações realizadas"}), 200
 
         except Exception as e:
             print(e)

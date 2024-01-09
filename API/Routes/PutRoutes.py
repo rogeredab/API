@@ -1,8 +1,9 @@
 from flask import Flask, jsonify, request
 from API.Controllers.PutController import PutController
 from API.Models.models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens
+from flask import Blueprint
 
-api = Flask(__name__)
+api = Blueprint('put_api', __name__)
 
 
 @api.route("/API/reqput/<req_id>/<req_emp>", methods=['PUT'])

@@ -1,8 +1,9 @@
 from flask import Flask, jsonify
 from API.Controllers.DeleteController import DeleteController
 from API.Models.models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens, Almoxarifado_requisicao_retirada
+from flask import Blueprint
 
-api = Flask(__name__)
+api = Blueprint('del_api', __name__)
 
 
 @api.route('/API/reqdel/<req_id>/<req_emp>', methods=['DELETE'])

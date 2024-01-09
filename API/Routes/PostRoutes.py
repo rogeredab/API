@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, request
 from API.Controllers.PostController import PostController
 from API.Models.models import Almoxarifado_requisicao, Almoxarifado_requisicao_itens, Almoxarifado_requisicao_retirada
+from flask import Blueprint
 
-api = Flask(__name__)
-
+api = Blueprint('post_api', __name__)
 
 @api.route("/API/reqpost", methods=["POST"])
 def postReq():

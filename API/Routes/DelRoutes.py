@@ -68,5 +68,3 @@ def delReqRet(req_item_id, req_emp):
         print("Erro: ", e)
 
 
-if __name__ == '__main__':
-    api.run(debug=True)

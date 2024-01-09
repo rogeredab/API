@@ -61,5 +61,4 @@ def getReqRetirada(req_id, req_emp):
         return 500
 
 
-if __name__ == '__main__':
-    api.run(debug=True)
+

@@ -31,6 +31,3 @@ def postReqItem(req_id,req_emp):
         print("Erro: ", e)
         return 500
 
-
-if __name__ == '__main__':
-    api.run(debug=True)

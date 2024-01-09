@@ -33,5 +33,3 @@ def putItemReq(req_id, req_emp, req_item_id):
         return 500
 
 
-if __name__ == '__main__':
-    api.run(debug=True)

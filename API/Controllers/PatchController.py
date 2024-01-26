@@ -23,6 +23,7 @@ class PatchController:
                 if not checkexiste:
                     return jsonify({"message": "Requisição inexistente ou parametros inválidos"}), 404
                 else:
-                    print(dados)
+                    print(dados['campoalterar'][0])
+
         except Exception as e:
             print(e)

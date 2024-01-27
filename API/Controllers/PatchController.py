@@ -16,14 +16,24 @@ class PatchController:
     def patch_req(self, tabela, dados, filtro):
         try:
             if tabela == models.Almoxarifado_requisicao:
-                checkexiste = self.session.query(models.Almoxarifado_requisicao).filter_by(ARE_ID=filtro[0],
-                                                                                           ARE_EMP_CODIGO=filtro[
-                                                                                               1]).first()
-
+                checkexiste = self.session.query(models.Almoxarifado_requisicao).filter_by(
+                    ARE_ID=filtro[0], ARE_EMP_CODIGO=filtro[1]).first()
                 if not checkexiste:
-                    return jsonify({"message": "Requisição inexistente ou parametros inválidos"}), 404
+                    return jsonify({"message": "Requisição inexistente ou parâmetros inválidos"}), 404
                 else:
-                    print(dados['campoalterar'][0])
+                    campo_alterar = dados['campoalterar']
+                    novo_valor = dados['novovalor']
+
+                    # Verificar se o campo a ser alterado está na lista permitida
+                    listacampos = ["ARE_ID", "ARE_TERMINAL_REQUISICAO", "ARE_TERMINAL_LIBERACAO", "ARE_DATAINC"]
+                    if campo_alterar not in listacampos:
+                        setattr(checkexiste, campo_alterar, novo_valor)
+                        self.session.commit()
+                        return jsonify({"message": "Atualização bem-sucedida"}), 200
+                    else:
+                        return jsonify({"message": "Campo sem permissão para alterar"}), 500
 
         except Exception as e:
             print(e)
+        finally:
+            self._close_session()

@@ -19,3 +19,16 @@ def patchReq(req_id, req_emp):
         print("Erro: ", e)
         return 500
 
+
+@api.route("/API/reqitempatch/<req_id>/<req_emp>", methods=["PATCH"])
+def patchReq(req_id, req_emp):
+    filtro = [req_id, req_emp]
+    try:
+        if request.is_json:
+            dados = request.get_json()
+            patch_controller = PatchController()
+            info = patch_controller.patch_req(patch_controller, Almoxarifado_requisicao_itens, dados, filtro)
+            return info
+    except Exception as e:
+        print("Erro: ", e)
+        return 500

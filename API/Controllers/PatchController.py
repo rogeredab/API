@@ -23,8 +23,6 @@ class PatchController:
                 else:
                     campo_alterar = dados['campoalterar']
                     novo_valor = dados['novovalor']
-
-                    # Verificar se o campo a ser alterado está na lista permitida
                     listacampos = ["ARE_ID", "ARE_TERMINAL_REQUISICAO", "ARE_TERMINAL_LIBERACAO", "ARE_DATAINC"]
                     if campo_alterar not in listacampos:
                         setattr(checkexiste, campo_alterar, novo_valor)
@@ -33,6 +31,30 @@ class PatchController:
                     else:
                         return jsonify({"message": "Campo sem permissão para alterar"}), 500
 
+        except Exception as e:
+            print(e)
+        finally:
+            self._close_session()
+
+    @staticmethod
+    def patch_req_item(self, tabela, dados, filtro):
+        try:
+            if tabela == models.Almoxarifado_requisicao_itens:
+                checkexiste = self.session.query(models.Almoxarifado_requisicao_itens).filter_by(ARI_ARE_ID=filtro[0],
+                                                                                                 ARI_EMP_CODIGO=filtro[
+                                                                                                     1], ARI_NI=filtro[2]).first()
+                if not checkexiste:
+                    return jsonify({"message": "Requisição inexistente ou parâmetros inválidos"}), 404
+                else:
+                    campo_alterar = dados['campoalterar']
+                    novo_valor = dados['novovalor']
+                    listacampos = ["ARI_ID", "ARI_NI", "ARI_ARE_ID", "ARI_DATAINC", "ARI_TERMINAL"]
+                    if campo_alterar not in listacampos:
+                        setattr(checkexiste, campo_alterar, novo_valor)
+                        self.session.commit()
+                        return jsonify({"message": "Atualização bem-sucedida"}), 200
+                    else:
+                        return jsonify({"message": "Campo sem permissão para alterar"}), 500
         except Exception as e:
             print(e)
         finally:
